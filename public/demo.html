@@ -893,62 +893,51 @@
 
     });
 
-    async function getCoordinates(address) {
-        let nominatinApiUrl = "http://localhost:7070";
 
-        return await fetch(nominatinApiUrl + "/search?q=" + address + "&format=jsonv2", {
-            method: "POST"
-        }).then(response => response.json());
-    }
-
-    function addWeights(distanceMatrix, weights) {
-        // add the weights of each location in the response received from the distance matrix api
-        // the weights are added in the metadata.query.locations object
-        for (let i = 0; i < weights.length; i++) {
-            distanceMatrix.metadata.query.locations[i] = {
-                location: distanceMatrix.metadata.query.locations[i],
-                weight: weights[i]
-            };
-        }
-
-    }
-
-    function addCars(distanceMatrix, carsWithCapacity) {
-        distanceMatrix.metadata.cars = carsWithCapacity;
-    }
-
-    async function getSolution(distanceMatrix) {
-        return fetch("http://localhost:5001/api/optimization", {
-            method: "POST",
-            body: JSON.stringify(distanceMatrix)
-        }).then(response => response.json());
-
-    }
-
-    async function getRoute() {
-        let addresses = ["Aleea magura vulturului 7", "Constantin Budisteanu 20", "Aleea Ilioara 3"];
-        // the weight of the package for each address destination (todo: maybe include this in the addresses object)
-        let weights = [3, 5, 1];
+    // Solving the problem
+    async function solveVehicleRoutingProblem() {
+        // first address is the depot
+        let addresses = [
+            "Str. Sinaia 18, bucuresti",
+            "Aleea magura vulturului 7",
+            "Constantin Budisteanu 20",
+            "Aleea Ilioara 3"
+        ];
+        // the weight (demand) of the package for each address destination (todo: maybe include this in the addresses object)
+        // first is the depot so the value is 0
+        let demands = [0, 3, 5, 1];
         // we have two cars each having a capacity of 5
         let carsWithCapacity = [5, 5];
 
+        // get the polar coordinates (lat, lng) from the nominatim api
         let nominatimResponses = addresses.map(address => getCoordinates(address));
         const nominatimObjects = await Promise.all(nominatimResponses);
 
-        // get the lat/lng from each nominatim query response and map them in an object required by the distance matrix
-        // {"locations":[[26.1347683,44.4443487],[26.1604182,44.4125858],[26.0901043,44.4433876]]}
-        let locations = nominatimObjects.flat(1).map(object => [object.lon, object.lat]);
+        // extract the lat/lng from each nominatim query response and map them in an object required by the distance matrix
+        // e.g {"locations":[[26.1347683,44.4443487],[26.1604182,44.4125858],[26.0901043,44.4433876]]}
+        let locations = nominatimObjects
+            .flat(1)
+            .map(object => [object.lon, object.lat]);
 
+        // call the openrouteservice api to get the distance matrix
         let distanceMatrix = await getDistanceMatrix(locations);
 
-        // add the weights and cars to the response from the distance matrix
-        addWeights(distanceMatrix, weights);
+        // add the demands and cars to the response from the distance matrix
+        addDemands(distanceMatrix, demands);
         addCars(distanceMatrix, carsWithCapacity);
 
         // send the distance matrix object to the Flask backend to calculate the routes
         const optimizedSolution = await getSolution(distanceMatrix);
 
         console.log(optimizedSolution);
+    }
+
+    async function getCoordinates(address) {
+        let nominatinApiUrl = "http://localhost:7070";
+
+        return await fetch(nominatinApiUrl + "/search?q=" + address + "&format=jsonv2", {
+            method: "POST"
+        }).then(response => response.json());
     }
 
     async function getDistanceMatrix(locations) {
@@ -963,6 +952,34 @@
         }).then(response => response.json());
     }
 
-    getRoute();
+    function addDemands(distanceMatrix, demands) {
+        // add the demands of each location in the response received from the distance matrix api
+        // the demands are added in the metadata.query.locations object
+        for (let i = 0; i < demands.length; i++) {
+            distanceMatrix.metadata.query.locations[i] = {
+                location: distanceMatrix.metadata.query.locations[i],
+                weight: demands[i]
+            };
+        }
 
+    }
+
+    function addCars(distanceMatrix, carsWithCapacity) {
+        distanceMatrix.metadata.cars = carsWithCapacity;
+    }
+
+    async function getSolution(distanceMatrix) {
+        console.log(distanceMatrix);
+        return fetch("http://localhost:5001/api/optimization", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(distanceMatrix)
+        }).then(response => response.json());
+    }
+
+
+    // this will run at page load and refresh
+    solveVehicleRoutingProblem();
 </script>
