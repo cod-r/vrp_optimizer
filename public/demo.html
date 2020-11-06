@@ -1,0 +1,968 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+          integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+          crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+            integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+            crossorigin=""></script>
+
+    <title>My Web Page</title>
+
+</head>
+
+<style>
+    #mapid {
+        height: 800px;
+    }
+</style>
+
+<body>
+<div id="mapid"></div>
+</body>
+
+<script>
+    const routeGeoJson = {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "bbox": [
+                    26.133175,
+                    44.412512,
+                    26.160411,
+                    44.444335
+                ],
+                "type": "Feature",
+                "properties": {
+                    "segments": [
+                        {
+                            "distance": 5234.1,
+                            "duration": 396.6,
+                            "steps": [
+                                {
+                                    "distance": 42.7,
+                                    "duration": 6.1,
+                                    "type": 11,
+                                    "instruction": "Head south on Aleea Măgura Vulturului",
+                                    "name": "Aleea Măgura Vulturului",
+                                    "way_points": [
+                                        0,
+                                        1
+                                    ]
+                                },
+                                {
+                                    "distance": 54.4,
+                                    "duration": 7.8,
+                                    "type": 0,
+                                    "instruction": "Turn left onto Aleea Măgura Vulturului",
+                                    "name": "Aleea Măgura Vulturului",
+                                    "way_points": [
+                                        1,
+                                        2
+                                    ]
+                                },
+                                {
+                                    "distance": 36.5,
+                                    "duration": 5.3,
+                                    "type": 1,
+                                    "instruction": "Turn right",
+                                    "name": "-",
+                                    "way_points": [
+                                        2,
+                                        3
+                                    ]
+                                },
+                                {
+                                    "distance": 37.2,
+                                    "duration": 5.4,
+                                    "type": 1,
+                                    "instruction": "Turn right onto Strada Elev Ștefan Ștefănescu",
+                                    "name": "Strada Elev Ștefan Ștefănescu",
+                                    "way_points": [
+                                        3,
+                                        4
+                                    ]
+                                },
+                                {
+                                    "distance": 111.6,
+                                    "duration": 16.1,
+                                    "type": 0,
+                                    "instruction": "Turn left",
+                                    "name": "-",
+                                    "way_points": [
+                                        4,
+                                        7
+                                    ]
+                                },
+                                {
+                                    "distance": 15.1,
+                                    "duration": 5.4,
+                                    "type": 0,
+                                    "instruction": "Turn left onto Strada Locotenent Sachelarie Visarion",
+                                    "name": "Strada Locotenent Sachelarie Visarion",
+                                    "way_points": [
+                                        7,
+                                        8
+                                    ]
+                                },
+                                {
+                                    "distance": 43.9,
+                                    "duration": 3.5,
+                                    "type": 1,
+                                    "instruction": "Turn right",
+                                    "name": "-",
+                                    "way_points": [
+                                        8,
+                                        9
+                                    ]
+                                },
+                                {
+                                    "distance": 177.8,
+                                    "duration": 14.2,
+                                    "type": 1,
+                                    "instruction": "Turn right",
+                                    "name": "-",
+                                    "way_points": [
+                                        9,
+                                        16
+                                    ]
+                                },
+                                {
+                                    "distance": 61.7,
+                                    "duration": 4.9,
+                                    "type": 1,
+                                    "instruction": "Turn right onto Șoseaua Iancului, DN3",
+                                    "name": "Șoseaua Iancului, DN3",
+                                    "way_points": [
+                                        16,
+                                        19
+                                    ]
+                                },
+                                {
+                                    "distance": 73.7,
+                                    "duration": 5.9,
+                                    "type": 5,
+                                    "instruction": "Turn slight right onto Piața Iancului, DN3",
+                                    "name": "Piața Iancului, DN3",
+                                    "way_points": [
+                                        19,
+                                        24
+                                    ]
+                                },
+                                {
+                                    "distance": 830.0,
+                                    "duration": 54.3,
+                                    "type": 2,
+                                    "instruction": "Turn sharp left onto Șoseaua Mihai Bravu",
+                                    "name": "Șoseaua Mihai Bravu",
+                                    "way_points": [
+                                        24,
+                                        44
+                                    ]
+                                },
+                                {
+                                    "distance": 1203.0,
+                                    "duration": 78.7,
+                                    "type": 13,
+                                    "instruction": "Keep right onto Șoseaua Mihai Bravu",
+                                    "name": "Șoseaua Mihai Bravu",
+                                    "way_points": [
+                                        44,
+                                        81
+                                    ]
+                                },
+                                {
+                                    "distance": 427.2,
+                                    "duration": 28.0,
+                                    "type": 6,
+                                    "instruction": "Continue straight onto Șoseaua Mihai Bravu",
+                                    "name": "Șoseaua Mihai Bravu",
+                                    "way_points": [
+                                        81,
+                                        93
+                                    ]
+                                },
+                                {
+                                    "distance": 1835.9,
+                                    "duration": 120.2,
+                                    "type": 0,
+                                    "instruction": "Turn left onto Bulevardul Camil Ressu",
+                                    "name": "Bulevardul Camil Ressu",
+                                    "way_points": [
+                                        93,
+                                        130
+                                    ]
+                                },
+                                {
+                                    "distance": 101.2,
+                                    "duration": 14.6,
+                                    "type": 1,
+                                    "instruction": "Turn right onto Strada Ilioara",
+                                    "name": "Strada Ilioara",
+                                    "way_points": [
+                                        130,
+                                        134
+                                    ]
+                                },
+                                {
+                                    "distance": 182.3,
+                                    "duration": 26.2,
+                                    "type": 0,
+                                    "instruction": "Turn left onto Aleea Ilioara",
+                                    "name": "Aleea Ilioara",
+                                    "way_points": [
+                                        134,
+                                        137
+                                    ]
+                                },
+                                {
+                                    "distance": 0.0,
+                                    "duration": 0.0,
+                                    "type": 10,
+                                    "instruction": "Arrive at Aleea Ilioara, on the left",
+                                    "name": "-",
+                                    "way_points": [
+                                        137,
+                                        137
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "extras": {
+                        "roadaccessrestrictions": {
+                            "values": [
+                                [
+                                    0,
+                                    130,
+                                    0
+                                ],
+                                [
+                                    130,
+                                    134,
+                                    16
+                                ],
+                                [
+                                    134,
+                                    137,
+                                    0
+                                ]
+                            ],
+                            "summary": [
+                                {
+                                    "value": 0.0,
+                                    "distance": 5132.9,
+                                    "amount": 98.07
+                                },
+                                {
+                                    "value": 16.0,
+                                    "distance": 101.2,
+                                    "amount": 1.93
+                                }
+                            ]
+                        }
+                    },
+                    "warnings": [
+                        {
+                            "code": 1,
+                            "message": "There may be restrictions on some roads"
+                        }
+                    ],
+                    "summary": {
+                        "distance": 5234.1,
+                        "duration": 396.6
+                    },
+                    "way_points": [
+                        0,
+                        137
+                    ]
+                },
+                "geometry": {
+                    "coordinates": [
+                        [
+                            26.134678,
+                            44.444335
+                        ],
+                        [
+                            26.134789,
+                            44.44396
+                        ],
+                        [
+                            26.13546,
+                            44.444058
+                        ],
+                        [
+                            26.135526,
+                            44.443733
+                        ],
+                        [
+                            26.135068,
+                            44.443662
+                        ],
+                        [
+                            26.135191,
+                            44.443196
+                        ],
+                        [
+                            26.135293,
+                            44.442943
+                        ],
+                        [
+                            26.135449,
+                            44.442702
+                        ],
+                        [
+                            26.135627,
+                            44.442749
+                        ],
+                        [
+                            26.135771,
+                            44.442368
+                        ],
+                        [
+                            26.135296,
+                            44.442257
+                        ],
+                        [
+                            26.135047,
+                            44.442207
+                        ],
+                        [
+                            26.134559,
+                            44.442099
+                        ],
+                        [
+                            26.134541,
+                            44.442086
+                        ],
+                        [
+                            26.134537,
+                            44.442067
+                        ],
+                        [
+                            26.134801,
+                            44.441535
+                        ],
+                        [
+                            26.134843,
+                            44.441449
+                        ],
+                        [
+                            26.13446,
+                            44.441405
+                        ],
+                        [
+                            26.134314,
+                            44.441386
+                        ],
+                        [
+                            26.134076,
+                            44.441359
+                        ],
+                        [
+                            26.133979,
+                            44.441368
+                        ],
+                        [
+                            26.133792,
+                            44.44136
+                        ],
+                        [
+                            26.133459,
+                            44.441303
+                        ],
+                        [
+                            26.133349,
+                            44.441277
+                        ],
+                        [
+                            26.133175,
+                            44.441236
+                        ],
+                        [
+                            26.133224,
+                            44.441204
+                        ],
+                        [
+                            26.133705,
+                            44.440843
+                        ],
+                        [
+                            26.133755,
+                            44.440803
+                        ],
+                        [
+                            26.134078,
+                            44.44051
+                        ],
+                        [
+                            26.134282,
+                            44.440306
+                        ],
+                        [
+                            26.134467,
+                            44.440067
+                        ],
+                        [
+                            26.135129,
+                            44.439137
+                        ],
+                        [
+                            26.135449,
+                            44.438678
+                        ],
+                        [
+                            26.135965,
+                            44.43793
+                        ],
+                        [
+                            26.1361,
+                            44.437727
+                        ],
+                        [
+                            26.136157,
+                            44.437634
+                        ],
+                        [
+                            26.136256,
+                            44.437465
+                        ],
+                        [
+                            26.136303,
+                            44.437369
+                        ],
+                        [
+                            26.136385,
+                            44.437147
+                        ],
+                        [
+                            26.136444,
+                            44.436991
+                        ],
+                        [
+                            26.136714,
+                            44.436275
+                        ],
+                        [
+                            26.136901,
+                            44.435807
+                        ],
+                        [
+                            26.13716,
+                            44.435127
+                        ],
+                        [
+                            26.137175,
+                            44.435094
+                        ],
+                        [
+                            26.137447,
+                            44.434517
+                        ],
+                        [
+                            26.1375,
+                            44.434074
+                        ],
+                        [
+                            26.137645,
+                            44.433674
+                        ],
+                        [
+                            26.138,
+                            44.4327
+                        ],
+                        [
+                            26.138116,
+                            44.432395
+                        ],
+                        [
+                            26.138163,
+                            44.432264
+                        ],
+                        [
+                            26.13827,
+                            44.432013
+                        ],
+                        [
+                            26.138286,
+                            44.431979
+                        ],
+                        [
+                            26.138367,
+                            44.431794
+                        ],
+                        [
+                            26.13839,
+                            44.43174
+                        ],
+                        [
+                            26.138455,
+                            44.431592
+                        ],
+                        [
+                            26.138581,
+                            44.4313
+                        ],
+                        [
+                            26.138707,
+                            44.43101
+                        ],
+                        [
+                            26.138811,
+                            44.430745
+                        ],
+                        [
+                            26.138863,
+                            44.430554
+                        ],
+                        [
+                            26.138913,
+                            44.430239
+                        ],
+                        [
+                            26.138918,
+                            44.430045
+                        ],
+                        [
+                            26.138915,
+                            44.42979
+                        ],
+                        [
+                            26.138902,
+                            44.429638
+                        ],
+                        [
+                            26.138896,
+                            44.429418
+                        ],
+                        [
+                            26.138932,
+                            44.429284
+                        ],
+                        [
+                            26.138849,
+                            44.42906
+                        ],
+                        [
+                            26.13883,
+                            44.429011
+                        ],
+                        [
+                            26.138729,
+                            44.428748
+                        ],
+                        [
+                            26.138674,
+                            44.428619
+                        ],
+                        [
+                            26.138663,
+                            44.428593
+                        ],
+                        [
+                            26.138634,
+                            44.42852
+                        ],
+                        [
+                            26.138553,
+                            44.428342
+                        ],
+                        [
+                            26.138057,
+                            44.427198
+                        ],
+                        [
+                            26.137772,
+                            44.42654
+                        ],
+                        [
+                            26.137549,
+                            44.425932
+                        ],
+                        [
+                            26.137508,
+                            44.425797
+                        ],
+                        [
+                            26.137436,
+                            44.425536
+                        ],
+                        [
+                            26.137394,
+                            44.425358
+                        ],
+                        [
+                            26.137357,
+                            44.425147
+                        ],
+                        [
+                            26.137292,
+                            44.424739
+                        ],
+                        [
+                            26.137277,
+                            44.424625
+                        ],
+                        [
+                            26.137242,
+                            44.423997
+                        ],
+                        [
+                            26.137239,
+                            44.423919
+                        ],
+                        [
+                            26.137229,
+                            44.423609
+                        ],
+                        [
+                            26.137221,
+                            44.423431
+                        ],
+                        [
+                            26.137216,
+                            44.42339
+                        ],
+                        [
+                            26.137206,
+                            44.423325
+                        ],
+                        [
+                            26.136923,
+                            44.421733
+                        ],
+                        [
+                            26.136859,
+                            44.421367
+                        ],
+                        [
+                            26.136712,
+                            44.420526
+                        ],
+                        [
+                            26.13667,
+                            44.420318
+                        ],
+                        [
+                            26.136657,
+                            44.420277
+                        ],
+                        [
+                            26.13664,
+                            44.420224
+                        ],
+                        [
+                            26.136622,
+                            44.420185
+                        ],
+                        [
+                            26.136716,
+                            44.420159
+                        ],
+                        [
+                            26.136808,
+                            44.420129
+                        ],
+                        [
+                            26.136969,
+                            44.420093
+                        ],
+                        [
+                            26.137201,
+                            44.420031
+                        ],
+                        [
+                            26.137269,
+                            44.420011
+                        ],
+                        [
+                            26.137728,
+                            44.41989
+                        ],
+                        [
+                            26.138058,
+                            44.419804
+                        ],
+                        [
+                            26.1388,
+                            44.419601
+                        ],
+                        [
+                            26.1394,
+                            44.419438
+                        ],
+                        [
+                            26.13989,
+                            44.419301
+                        ],
+                        [
+                            26.140091,
+                            44.419245
+                        ],
+                        [
+                            26.140318,
+                            44.419184
+                        ],
+                        [
+                            26.142073,
+                            44.418737
+                        ],
+                        [
+                            26.14295,
+                            44.418514
+                        ],
+                        [
+                            26.143465,
+                            44.418381
+                        ],
+                        [
+                            26.143595,
+                            44.418349
+                        ],
+                        [
+                            26.145693,
+                            44.417796
+                        ],
+                        [
+                            26.145967,
+                            44.417714
+                        ],
+                        [
+                            26.146147,
+                            44.417657
+                        ],
+                        [
+                            26.146364,
+                            44.417587
+                        ],
+                        [
+                            26.146479,
+                            44.417549
+                        ],
+                        [
+                            26.147886,
+                            44.416994
+                        ],
+                        [
+                            26.152471,
+                            44.415116
+                        ],
+                        [
+                            26.15296,
+                            44.414909
+                        ],
+                        [
+                            26.153098,
+                            44.41485
+                        ],
+                        [
+                            26.153198,
+                            44.414809
+                        ],
+                        [
+                            26.153306,
+                            44.414763
+                        ],
+                        [
+                            26.153455,
+                            44.414704
+                        ],
+                        [
+                            26.154975,
+                            44.414095
+                        ],
+                        [
+                            26.155402,
+                            44.413954
+                        ],
+                        [
+                            26.155638,
+                            44.413877
+                        ],
+                        [
+                            26.156206,
+                            44.413732
+                        ],
+                        [
+                            26.156695,
+                            44.413619
+                        ],
+                        [
+                            26.156756,
+                            44.413605
+                        ],
+                        [
+                            26.157007,
+                            44.413557
+                        ],
+                        [
+                            26.157523,
+                            44.413474
+                        ],
+                        [
+                            26.157633,
+                            44.41346
+                        ],
+                        [
+                            26.157672,
+                            44.413394
+                        ],
+                        [
+                            26.157807,
+                            44.413169
+                        ],
+                        [
+                            26.1579,
+                            44.413
+                        ],
+                        [
+                            26.158121,
+                            44.412619
+                        ],
+                        [
+                            26.159715,
+                            44.412545
+                        ],
+                        [
+                            26.159792,
+                            44.412542
+                        ],
+                        [
+                            26.160411,
+                            44.412512
+                        ]
+                    ],
+                    "type": "LineString"
+                }
+            }
+        ],
+        "bbox": [
+            26.133175,
+            44.412512,
+            26.160411,
+            44.444335
+        ],
+        "metadata": {
+            "attribution": "openrouteservice.org, OpenStreetMap contributors",
+            "service": "routing",
+            "timestamp": 1604341361990,
+            "query": {
+                "coordinates": [
+                    [
+                        26.1347683,
+                        44.4443487
+                    ],
+                    [
+                        26.1604182,
+                        44.4125858
+                    ]
+                ],
+                "profile": "driving-car",
+                "format": "json"
+            },
+            "engine": {
+                "version": "6.3.1",
+                "build_date": "2020-11-01T09:49:06Z",
+                "graph_date": "2020-10-24T20:42:02Z"
+            }
+        }
+    }
+    // initialize map
+    let map = L.map('mapid').setView([44.432283, 26.104162], 15);
+    L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18
+    }).addTo(map);
+    // add route to map
+    let path = L.geoJSON(routeGeoJson).addTo(map);
+    map.addLayer(path);
+    // center map to fit the route
+    map.fitBounds(path.getBounds());
+
+    let markerStart = L.marker([
+        44.4443487,
+        26.1347683
+    ]).addTo(map);
+    markerStart.bindPopup('Starting point');
+
+
+    map.on('click', function (e) {
+        var marker = new L.marker(e.latlng).addTo(map);
+        marker.bindPopup(marker.getLatLng().lat + ', ' + marker.getLatLng().lng);
+
+    });
+
+    async function getCoordinates(address) {
+        let nominatinApiUrl = "http://localhost:7070";
+
+        return await fetch(nominatinApiUrl + "/search?q=" + address + "&format=jsonv2", {
+            method: "POST"
+        }).then(response => response.json());
+    }
+
+    function addWeights(distanceMatrix, weights) {
+        // add the weights of each location in the response received from the distance matrix api
+        // the weights are added in the metadata.query.locations object
+        for (let i = 0; i < weights.length; i++) {
+            distanceMatrix.metadata.query.locations[i] = {
+                location: distanceMatrix.metadata.query.locations[i],
+                weight: weights[i]
+            };
+        }
+
+    }
+
+    function addCars(distanceMatrix, carsWithCapacity) {
+        distanceMatrix.metadata.cars = carsWithCapacity;
+    }
+
+    async function getSolution(distanceMatrix) {
+        return fetch("http://localhost:5001/api/optimization", {
+            method: "POST",
+            body: JSON.stringify(distanceMatrix)
+        }).then(response => response.json());
+
+    }
+
+    async function getRoute() {
+        let addresses = ["Aleea magura vulturului 7", "Constantin Budisteanu 20", "Aleea Ilioara 3"];
+        // the weight of the package for each address destination (todo: maybe include this in the addresses object)
+        let weights = [3, 5, 1];
+        // we have two cars each having a capacity of 5
+        let carsWithCapacity = [5, 5];
+
+        let nominatimResponses = addresses.map(address => getCoordinates(address));
+        const nominatimObjects = await Promise.all(nominatimResponses);
+
+        // get the lat/lng from each nominatim query response and map them in an object required by the distance matrix
+        // {"locations":[[26.1347683,44.4443487],[26.1604182,44.4125858],[26.0901043,44.4433876]]}
+        let locations = nominatimObjects.flat(1).map(object => [object.lon, object.lat]);
+
+        let distanceMatrix = await getDistanceMatrix(locations);
+
+        // add the weights and cars to the response from the distance matrix
+        addWeights(distanceMatrix, weights);
+        addCars(distanceMatrix, carsWithCapacity);
+
+        // send the distance matrix object to the Flask backend to calculate the routes
+        const optimizedSolution = await getSolution(distanceMatrix);
+
+        console.log(optimizedSolution);
+    }
+
+    async function getDistanceMatrix(locations) {
+        let matrixApiUrl = "http://localhost:8080/ors/v2/matrix/driving-car";
+
+        return await fetch(matrixApiUrl, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({locations: locations})
+        }).then(response => response.json());
+    }
+
+    getRoute();
+
+</script>
