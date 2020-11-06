@@ -1,0 +1,13 @@
+#mapid {
+    position: relative;
+    z-index: 1;
+    height: 800px;
+}
+
+.btnid {
+    margin-top: 30px;
+    position: absolute;
+    z-index: 2;
+    width: 300px;
+    margin-left: 20px;
+}
