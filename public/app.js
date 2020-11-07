@@ -1,5 +1,5 @@
 const colors = ['blue', 'red', 'green', 'purple'];
-let depotLocation = 'Aleea Fizicienilor nr 2B';
+let depotLocation = 'Aleea Fizicienilor 2B';
 document.getElementById("depotLocationId").value = depotLocation;
 
 // initialize map
@@ -12,6 +12,19 @@ L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 L.control.zoom({
     position: 'bottomright'
 }).addTo(map);
+
+// add depot marker
+let depotMarkerHomeIcon = L.AwesomeMarkers.icon({
+    icon: 'fa-home',
+    prefix: 'fa',
+    markerColor: 'cadetblue',
+});
+let depotMarker = L.marker([44.4124659, 26.15551082786226],
+    {icon: depotMarkerHomeIcon,}
+).addTo(map);
+depotMarker.depot = true;
+depotMarker.bindPopup('Main Depot');
+
 
 // add markers on click
 map.on('click', function (e) {
@@ -53,27 +66,41 @@ async function addMarkerAddressToAddressList(address, marker) {
 async function solveProblemForSelectedMarkers() {
     let markerLocations = [];
     let demands = [];
-    let carsWithCapacity = [];
+    let carsWithCapacity = [2, 3, 5];
+
+    // add the depot marker first
+    map.eachLayer(function (layer) {
+        if (layer instanceof L.Marker && layer.depot) {
+            markerLocations.push([layer.getLatLng().lng, layer.getLatLng().lat]);
+            console.log(layer.getLatLng())
+        }
+    });
+
+    // push the weight of the depot last one
+    demands.push(0);
+
+    console.log(demands)
 
     // get coords from all markers from the map
     map.eachLayer(function (layer) {
-        if (layer instanceof L.Marker) {
+        if (layer instanceof L.Marker && !layer.depot) {
             markerLocations.push([layer.getLatLng().lng, layer.getLatLng().lat]);
         }
     });
+
 
     let divsWithTags = document.getElementsByClassName("tagClass");
     //get the demands from address list
     for (let i = 1; i < divsWithTags.length; i++) {
         let weightInput = divsWithTags[i].childNodes[1].childNodes[3].childNodes[3];
-        demands.push(weightInput.value);
+        demands.push(parseInt(weightInput.value));
     }
 
     // // call the openrouteservice api to get the distance matrix
-     let distanceMatrix = await getDistanceMatrix(markerLocations);
+    let distanceMatrix = await getDistanceMatrix(markerLocations);
     //
     // // add the demands and cars to the response from the distance matrix
-     addDemands(distanceMatrix, demands);
+    addDemands(distanceMatrix, demands);
 
     //get the capacities from the cars modal built by madalina
     let numberOfCars = parseInt(document.getElementById("numberOfCarsId").value);
@@ -81,16 +108,19 @@ async function solveProblemForSelectedMarkers() {
         carsWithCapacity.push(parseInt(document.getElementById("carCapacityLabel" + i).value))
     }
     addCars(distanceMatrix, carsWithCapacity);
+    console.log(distanceMatrix);
     // // send the distance matrix object to the Flask backend to calculate the routes
     const optimizedSolution = await getSolution(distanceMatrix);
     await showSolutionOnMapForSelectedMarkers(optimizedSolution);
 }
 
 async function showSolutionOnMapForSelectedMarkers(optimizedSolution) {
+    console.log(optimizedSolution);
+
     // delete current markers so we can show the ones with numbers
     deleteAllMarkers();
 
-    let cont = 0;
+    let routesCont = 0;
 
     for (const route of optimizedSolution.routes) {
         let locationsArray = [];
@@ -98,17 +128,13 @@ async function showSolutionOnMapForSelectedMarkers(optimizedSolution) {
         route.locations.forEach(location => {
             locationsArray.push(location.location)
             if (cont2 === 0) {
-                L.marker([
-                        location.location[1],
-                        location.location[0]
-                    ]
-                ).addTo(map);
+
             } else if (route.locations.length > cont2 + 1) {
 
                 let coloredMarkerIcon = L.AwesomeMarkers.icon({
                     icon: '',
                     prefix: 'fa',
-                    markerColor: colors[cont],
+                    markerColor: colors[routesCont],
                     html: cont2
                 });
                 L.marker([
@@ -121,22 +147,24 @@ async function showSolutionOnMapForSelectedMarkers(optimizedSolution) {
             cont2++;
         })
 
+        console.log(locationsArray)
         let vehicleRoute = await getDirections(locationsArray);
 
         let path = L.geoJSON(vehicleRoute);
 
         path.setStyle({
-            color: colors[cont]
+            color: colors[routesCont]
         });
         map.addLayer(path);
 
-        cont++;
+        console.log(routesCont);
+        routesCont++;
     }
 }
 
 function deleteAllMarkers() {
     map.eachLayer(function (layer) {
-        if (layer instanceof L.Marker) {
+        if (layer instanceof L.Marker && !layer.depot) {
             layer.remove();
         }
     });
@@ -275,7 +303,6 @@ function addCars(distanceMatrix, carsWithCapacity) {
 }
 
 async function getSolution(distanceMatrix) {
-    console.log(distanceMatrix);
     return fetch("http://localhost:5001/api/cvrp", {
         method: "POST",
         headers: {
@@ -360,8 +387,12 @@ function getCarDetails() {
     //elem.style.color = newColor;
 }
 
-function saveDepotAddress() {
+async function saveDepotAddress() {
     depotLocation = document.getElementById("depotLocationId").value;
+
+    const depotCoords = await getCoordinates(depotLocation);
+    depotMarker.setLatLng([depotCoords[0].lat, depotCoords[0].lon]);
+
 }
 
 function menuBtnEvent() {
@@ -387,19 +418,15 @@ function backBtnEvent() {
 
 function numberOfCarsEvent(element) {
     if (event.key === 'Enter') {
-        console.log("enter");
-        console.log(element.value);
         appendCars(element.value);
     }
 }
 
 function appendCars(nr) {
-    console.log("appendCars");
     let div = document.getElementById("listOfCarsId");
     div.innerHTML = '';
 
     for (let i = 1; i <= nr; i++) {
-        console.log(i);
 
         ///////////////////////////////////////////////////
         let newDivName = document.createElement('div');
