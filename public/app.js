@@ -66,7 +66,7 @@ async function addMarkerAddressToAddressList(address, marker) {
 async function solveProblemForSelectedMarkers() {
     let markerLocations = [];
     let demands = [];
-    let carsWithCapacity = [2, 3, 5];
+    let carsWithCapacity = [];
 
     // add the depot marker first
     map.eachLayer(function (layer) {
@@ -78,8 +78,6 @@ async function solveProblemForSelectedMarkers() {
 
     // push the weight of the depot last one
     demands.push(0);
-
-    console.log(demands)
 
     // get coords from all markers from the map
     map.eachLayer(function (layer) {
@@ -108,6 +106,7 @@ async function solveProblemForSelectedMarkers() {
         carsWithCapacity.push(parseInt(document.getElementById("carCapacityLabel" + i).value))
     }
     addCars(distanceMatrix, carsWithCapacity);
+    console.log("distanceMatrix");
     console.log(distanceMatrix);
     // // send the distance matrix object to the Flask backend to calculate the routes
     const optimizedSolution = await getSolution(distanceMatrix);
@@ -115,10 +114,11 @@ async function solveProblemForSelectedMarkers() {
 }
 
 async function showSolutionOnMapForSelectedMarkers(optimizedSolution) {
+    console.log("optimizedSolution");
     console.log(optimizedSolution);
 
     // delete current markers so we can show the ones with numbers
-    deleteAllMarkers();
+    // deleteAllMarkers();
 
     let routesCont = 0;
 
@@ -137,17 +137,27 @@ async function showSolutionOnMapForSelectedMarkers(optimizedSolution) {
                     markerColor: colors[routesCont],
                     html: cont2
                 });
-                L.marker([
+                let mark = L.marker([
                         location.location[1],
                         location.location[0]
                     ],
                     {icon: coloredMarkerIcon}
-                ).addTo(map);
+                );
+                mark.bindPopup('Weight: ' + location.demand);
+
+                // map.eachLayer(function (layer) {
+                //
+                //     if (layer instanceof L.Marker ) {
+                //         console.log(layer.getLatLng());
+                //         console.log(mark.getLatLng())
+                //         // layer.remove();
+                //     }
+                // });
+                mark.addTo(map);
             }
             cont2++;
         })
 
-        console.log(locationsArray)
         let vehicleRoute = await getDirections(locationsArray);
 
         let path = L.geoJSON(vehicleRoute);
@@ -155,9 +165,11 @@ async function showSolutionOnMapForSelectedMarkers(optimizedSolution) {
         path.setStyle({
             color: colors[routesCont]
         });
+        path.on('mouseover', function (e) {
+            path.bindPopup(parseInt(document.getElementById("carCapacityLabel" + routesCont).value));
+        });
         map.addLayer(path);
 
-        console.log(routesCont);
         routesCont++;
     }
 }
@@ -170,51 +182,6 @@ function deleteAllMarkers() {
     });
 }
 
-async function showSolutionOnMap(optimizedSolution) {
-    let cont = 0;
-
-    for (const route of optimizedSolution.routes) {
-        let locationsArray = [];
-        let cont2 = 0;
-        route.locations.forEach(location => {
-            locationsArray.push(location.location)
-            if (cont2 === 0) {
-                L.marker([
-                        location.location[1],
-                        location.location[0]
-                    ]
-                ).addTo(map);
-            } else if (route.locations.length > cont2 + 1) {
-
-                let coloredMarkerIcon = L.AwesomeMarkers.icon({
-                    icon: '',
-                    prefix: 'fa',
-                    markerColor: colors[cont],
-                    html: cont2
-                });
-                L.marker([
-                        location.location[1],
-                        location.location[0]
-                    ],
-                    {icon: coloredMarkerIcon}
-                ).addTo(map);
-            }
-            cont2++;
-        })
-
-        let vehicleRoute = await getDirections(locationsArray);
-
-        let path = L.geoJSON(vehicleRoute);
-
-        path.setStyle({
-            color: colors[cont]
-        });
-        map.addLayer(path);
-
-        cont++;
-    }
-}
-
 async function getDirections(coordinates) {
     let directionsApiUrl = "http://localhost:8080/ors/v2/directions/driving-car/geojson";
 
@@ -225,45 +192,6 @@ async function getDirections(coordinates) {
         },
         body: JSON.stringify({coordinates: coordinates})
     }).then(response => response.json());
-}
-
-// Solving the problem
-async function solveHardCodedProblem() {
-    // first address is the depot
-    let addresses = [
-        "Str. Sinaia 18, bucuresti",
-        "Aleea magura vulturului 7",
-        "Constantin Budisteanu 20",
-        "Aleea Ilioara 3"
-    ];
-    // the weight (demand) of the package for each address destination (todo: maybe include this in the addresses object)
-    // first is the depot so the value is 0
-    let demands = [0, 3, 5, 1];
-    // we have two cars each having a capacity of 5
-    let carsWithCapacity = [5, 5];
-
-    // get the polar coordinates (lat, lng) from the nominatim api
-    let nominatimResponses = addresses.map(address => getCoordinates(address));
-    const nominatimObjects = await Promise.all(nominatimResponses);
-
-    // extract the lat/lng from each nominatim query response and map them in an object required by the distance matrix
-    // e.g {"locations":[[26.1347683,44.4443487],[26.1604182,44.4125858],[26.0901043,44.4433876]]}
-    let locations = nominatimObjects
-        .flat(1)
-        .map(object => [object.lon, object.lat]);
-
-    // call the openrouteservice api to get the distance matrix
-    let distanceMatrix = await getDistanceMatrix(locations);
-
-    // add the demands and cars to the response from the distance matrix
-    addDemands(distanceMatrix, demands);
-    addCars(distanceMatrix, carsWithCapacity);
-
-    // send the distance matrix object to the Flask backend to calculate the routes
-    const optimizedSolution = await getSolution(distanceMatrix);
-
-    await showSolutionOnMap(optimizedSolution)
-    console.log(optimizedSolution);
 }
 
 async function getCoordinates(address) {
@@ -383,8 +311,6 @@ async function generateRoutes() {
 
 function getCarDetails() {
     var elem = document.getElementById('home-btn-id');
-    console.log("home modal");
-    //elem.style.color = newColor;
 }
 
 async function saveDepotAddress() {
