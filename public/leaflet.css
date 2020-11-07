@@ -1,7 +1,7 @@
 #mapid {
     position: relative;
     z-index: 1;
-    height: 800px;
+    height: 100vh;
 }
 
 .btnid {
@@ -10,4 +10,70 @@
     z-index: 2;
     width: 300px;
     margin-left: 20px;
+    border-radius: 10px;
+}
+
+.tag {
+    font-size: 14px;
+    padding: .3em .4em .4em;
+    margin: 0 .1em;
+}
+
+.tag a {
+    color: #bbbbbb;
+    cursor: pointer;
+    opacity: 0.6;
+}
+
+.tag a:hover {
+    opacity: 1.0
+}
+
+.tag .remove {
+    vertical-align: bottom;
+    top: 0;
+}
+
+.tag a {
+    margin: 0 0 0 .3em;
+}
+
+.divWithSearchTags {
+    background-color: white;
+    margin-top: 80px;
+    position: absolute;
+    z-index: 2;
+    margin-left: 20px;
+    width: 300px;
+    height: 340px;
+    border-radius: 10px;
+}
+
+.interiorDivWithTags {
+    overflow-y: scroll;
+    overflow-x: hidden;
+    height: 260px;
+    margin-bottom: 10px;
+}
+
+.divGenerateRoutes {
+    margin-top: 20px;
+    height: 40px;
+    text-align: -webkit-center;
+}
+
+.addressP {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    width: 230px;
+    white-space: nowrap;
+    margin-bottom: 0;
+    font-size: 14px;
+    text-align: left;
+}
+
+.tagClass {
+    margin-top: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
 }
