@@ -1,14 +1,4 @@
-module.exports = {
-    foo: testf()
-}
-
-function testf() {
-    console.log('ceva')
-}
-
-
 const colors = ['blue', 'red', 'green', 'purple'];
-
 // initialize map
 let map = L.map('mapid', {
     zoomControl: false
