@@ -1,6 +1,5 @@
 // Check for posted distance in express backend
 let backendResponse = false;
-let ceva = 'abcs';
 
 setInterval(function () {
     fetch("http://localhost:3000/distance_matrix", {
