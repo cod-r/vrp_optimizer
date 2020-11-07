@@ -1,4 +1,6 @@
 const colors = ['blue', 'red', 'green', 'purple'];
+let depotLocation = 'Aleea Fizicienilor nr 2B';
+document.getElementById("depotLocationId").value = depotLocation;
 
 // initialize map
 let map = L.map('mapid', {
@@ -51,7 +53,7 @@ async function addMarkerAddressToAddressList(address, marker) {
 async function solveProblemForSelectedMarkers() {
     let markerLocations = [];
     let demands = [];
-    let carsWithCapacity = [1000];
+    let carsWithCapacity = [];
 
     // get coords from all markers from the map
     map.eachLayer(function (layer) {
@@ -60,22 +62,27 @@ async function solveProblemForSelectedMarkers() {
         }
     });
 
-    // Generate dummy demands TODO: get the demands from address list
-    for (let i = 0; i < markerLocations.length; i++) {
-        demands.push(1);
+    let divsWithTags = document.getElementsByClassName("tagClass");
+    //get the demands from address list
+    for (let i = 1; i < divsWithTags.length; i++) {
+        let weightInput = divsWithTags[i].childNodes[1].childNodes[3].childNodes[3];
+        demands.push(weightInput.value);
     }
 
-    // call the openrouteservice api to get the distance matrix
-    let distanceMatrix = await getDistanceMatrix(markerLocations);
+    // // call the openrouteservice api to get the distance matrix
+     let distanceMatrix = await getDistanceMatrix(markerLocations);
+    //
+    // // add the demands and cars to the response from the distance matrix
+     addDemands(distanceMatrix, demands);
 
-    // add the demands and cars to the response from the distance matrix
-    addDemands(distanceMatrix, demands);
-    // TODO: get the capacities from the modal built by madalina
+    //get the capacities from the cars modal built by madalina
+    let numberOfCars = parseInt(document.getElementById("numberOfCarsId").value);
+    for (let i = 1; i <= numberOfCars; i++) {
+        carsWithCapacity.push(parseInt(document.getElementById("carCapacityLabel" + i).value))
+    }
     addCars(distanceMatrix, carsWithCapacity);
-
-    // send the distance matrix object to the Flask backend to calculate the routes
+    // // send the distance matrix object to the Flask backend to calculate the routes
     const optimizedSolution = await getSolution(distanceMatrix);
-
     await showSolutionOnMapForSelectedMarkers(optimizedSolution);
 }
 
@@ -353,6 +360,10 @@ function getCarDetails() {
     //elem.style.color = newColor;
 }
 
+function saveDepotAddress() {
+    depotLocation = document.getElementById("depotLocationId").value;
+}
+
 function menuBtnEvent() {
     let page1 = document.getElementById('page1');
     page1.classList.add("hide");
@@ -435,5 +446,4 @@ function appendCars(nr) {
         div.appendChild(newDivName);
         div.appendChild(newDivCapacity);
     }
-
 }
