@@ -50,7 +50,7 @@
 }
 
 .interiorDivWithTags {
-    overflow-y: scroll;
+    overflow-y: auto;
     overflow-x: hidden;
     height: 260px;
     margin-bottom: 10px;
