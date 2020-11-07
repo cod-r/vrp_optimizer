@@ -367,18 +367,21 @@ function saveDepotAddress() {
 function menuBtnEvent() {
     let page1 = document.getElementById('page1');
     page1.classList.add("hide");
+    let searchTags = document.getElementById('searchTags');
+    searchTags.classList.add("hide");
 
     let page2 = document.getElementById('page2');
     page2.classList.remove("hide");
 }
 
 function backBtnEvent() {
-    console.log("fvgrg");
     let page2 = document.getElementById('page2');
     page2.classList.add("hide");
 
     let page1 = document.getElementById('page1');
     page1.classList.remove("hide");
+    let searchTags = document.getElementById('searchTags');
+    searchTags.classList.remove("hide");
 
 }
 

@@ -45,7 +45,7 @@
                                                         aria-hidden="true"></i></a></span>
     </div>
 </div>
-<div class="divWithSearchTags" style="visibility: hidden;">
+<div id="searchTags" class="divWithSearchTags" style="visibility: hidden;">
     <div class="interiorDivWithTags">
         <div class="tagClass" style="display: none;">
            <span class="tag badge badge-primary" style="display:grid;">
@@ -71,9 +71,10 @@
 <!-- Madalina-->
 
 <div id="page2" class="hide">
-    <button id="backBtnId" type="button" class="btn btn-primary" style='font-size:24px'>
+
+    <button id="backBtnId" type="button" class="btn btn-primary" >
+        <i class='fas fa-angle-double-left' style = "float:left;  font-size:20px; " onclick="backBtnEvent()"></i>
         Transporters
-        <i class='fas fa-angle-double-left' style='font-size:24px' onclick="backBtnEvent()"></i>
     </button>
 
     <button id="homeBtnId" type="button" class="btn btn-primary" data-toggle="modal" data-target="#homeModal"
