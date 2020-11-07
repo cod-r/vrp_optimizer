@@ -7,7 +7,7 @@
           crossorigin=""/>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
           integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-    <link rel="stylesheet" href="leaflet.css">
+    <link rel="stylesheet" href="demo.css">
     <link href="https://use.fontawesome.com/releases/v5.0.4/css/all.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="leaflet_awesome/leaflet.awesome-markers.css">
@@ -31,10 +31,11 @@
 </head>
 
 <body>
-<div class="input-group md-form form-sm form-2 pl-0 btnid" style="border-radius: 10px;">
-    <div class="input-group-append">
-        <span class="input-group-text red lighten-3" style="background-color: #ffff;border: 1px solid #ffffff;"><i
-                class="fas fa-bars text-grey" aria-hidden="true"></i></span>
+<!-- Alina-->
+<div id="page1" class="input-group md-form form-sm form-2 pl-0 btnid" style="border-radius: 10px;">
+    <div class="input-group-append" onclick="menuBtnEvent()">
+        <span class="input-group-text red lighten-3" style="background-color: #ffff;border: 1px solid #ffffff;">
+            <i class="fas fa-bars text-grey" aria-hidden="true"></i></span>
     </div>
     <input class="form-control my-0 py-1 amber-border" style="background-color: white;border: 1px solid #ffffff;"
            type="text" placeholder="Search" aria-label="Search" id="searchId">
@@ -66,355 +67,94 @@
         <button type="button" class="btn btn-success" onclick="generateRoutes()">Generate routes</button>
     </div>
 </div>
+
+<!-- Madalina-->
+
+<div id="page2" class="hide">
+    <button id="backBtnId" type="button" class="btn btn-primary" style='font-size:24px'>
+        Transporters
+        <i class='fas fa-angle-double-left' style='font-size:24px' onclick="backBtnEvent()"></i>
+    </button>
+
+    <button id="homeBtnId" type="button" class="btn btn-primary" data-toggle="modal" data-target="#homeModal">
+        <i class='fas fa-car'></i>
+        Locatie depozit
+    </button>
+    <button id="carBtnId" type="button" class="btn btn-primary" data-toggle="modal" data-target="#carModal">
+        <i class='fas fa-home'></i>
+        Config masini
+    </button>
+</div>
+
+<!-- Home Modal -->
+<div class="modal fade" id="homeModal" tabindex="-1" role="dialog" aria-labelledby="homeModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="homeModalLabel">Choose your starting point:</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="input-group md-form form-sm form-2 pl-0">
+                    <input class="form-control my-0 py-1 amber-border" type="text" placeholder="Search"
+                           aria-label="Search">
+                    <div class="input-group-append">
+                    <span class="input-group-text amber lighten-3" id="basic-text1"><i class="fas fa-search text-grey"
+                                                                                       aria-hidden="true"></i></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Cars Modal -->
+<div class="modal fade" id="carModal" tabindex="-1" role="dialog" aria-labelledby="carModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="carModalLabel">Set number of cars:</h5>
+                <a class="close" data-dismiss="modal">&times;</a>
+            </div>
+
+            <div class="modal-body">
+
+
+                <div class="form-group row">
+                    <label for="numberOfCarsId" class="col-sm-4 col-form-label">Number of cars:</label>
+                    <div class="col-sm-3">
+                        <input type="text" class="form-control" id="numberOfCarsId" onkeydown="numberOfCarsEvent(this)">
+                    </div>
+                </div>
+
+                <form id="listOfCarsId" style="max-height: 400px; overflow-y: auto;">
+                    <!-- action="/action_page.php" method="get" -->
+
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <!--<button type="button" class="btn btn-primary" onclick="getCarDetails()">Save changes</button>-->
+                <button type="submit" class="btn btn-primary" form="listOfCarsId">Save changes</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
 <div id="mapid"></div>
+
 </body>
 
-<script>
-    const colors = ['blue', 'red', 'green', 'purple'];
 
-    // initialize map
-    let map = L.map('mapid', {
-        zoomControl: false
-    }).setView([44.432283, 26.104162], 13);
-    L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 18
-    }).addTo(map);
-    L.control.zoom({
-        position: 'bottomright'
-    }).addTo(map);
-
-    // add markers on click
-    map.on('click', function (e) {
-        let marker = L.marker(e.latlng).addTo(map);
-
-        getAddress(e.latlng)
-            .then(address => addMarkerAddressToAddressList(address, marker));
-    });
-
-    // Reverse geocoding: get address from coordinates
-    async function getAddress(latlng) {
-        let nominatinApiUrl = "http://localhost:7070";
-
-        return await fetch(nominatinApiUrl + "/reverse?lat=" + latlng.lat + "&lon=" + latlng.lng + "&format=jsonv2", {
-            method: "GET"
-        }).then(response => response.json());
-    }
-
-    async function addMarkerAddressToAddressList(address, marker) {
-        const fullAddress = address.display_name;
-
-        let divWithSearchTags = document.getElementsByClassName("divWithSearchTags")[0];
-        let interiorDiv = document.getElementsByClassName("interiorDivWithTags")[0];
-        if (divWithSearchTags.style.visibility === 'hidden') {
-            divWithSearchTags.style.visibility = 'visible';
-        }
-        let divWithSearchTag = document.getElementsByClassName("tagClass")[0];
-        let clone = divWithSearchTag.cloneNode(true);
-        interiorDiv.appendChild(clone);
-        document.getElementsByClassName("addressP")[i].innerHTML = fullAddress;
-        clone.style.display = 'block';
-        clone.id = 'clone-' + i;
-        i++;
-
-        // Add the address to the marker so we can find it and delete the marker on address delete
-        marker.address = fullAddress;
-    }
-
-    async function solveProblemForSelectedMarkers() {
-        let markerLocations = [];
-        let demands = [];
-        let carsWithCapacity = [1000];
-
-        // get coords from all markers from the map
-        map.eachLayer(function (layer) {
-            if (layer instanceof L.Marker) {
-                markerLocations.push([layer.getLatLng().lng, layer.getLatLng().lat]);
-            }
-        });
-
-        // Generate dummy demands TODO: get the demands from address list
-        for (let i = 0; i < markerLocations.length; i++) {
-            demands.push(1);
-        }
-
-        // call the openrouteservice api to get the distance matrix
-        let distanceMatrix = await getDistanceMatrix(markerLocations);
-
-        // add the demands and cars to the response from the distance matrix
-        addDemands(distanceMatrix, demands);
-        // TODO: get the capacities from the modal built by madalina
-        addCars(distanceMatrix, carsWithCapacity);
-
-        // send the distance matrix object to the Flask backend to calculate the routes
-        const optimizedSolution = await getSolution(distanceMatrix);
-
-        await showSolutionOnMapForSelectedMarkers(optimizedSolution);
-    }
-
-    async function showSolutionOnMapForSelectedMarkers(optimizedSolution) {
-        // delete current markers so we can show the ones with numbers
-        deleteAllMarkers();
-
-        let cont = 0;
-
-        for (const route of optimizedSolution.routes) {
-            let locationsArray = [];
-            let cont2 = 0;
-            route.locations.forEach(location => {
-                locationsArray.push(location.location)
-                if (cont2 === 0) {
-                    L.marker([
-                            location.location[1],
-                            location.location[0]
-                        ]
-                    ).addTo(map);
-                } else if (route.locations.length > cont2 + 1) {
-
-                    let coloredMarkerIcon = L.AwesomeMarkers.icon({
-                        icon: '',
-                        prefix: 'fa',
-                        markerColor: colors[cont],
-                        html: cont2
-                    });
-                    L.marker([
-                            location.location[1],
-                            location.location[0]
-                        ],
-                        {icon: coloredMarkerIcon}
-                    ).addTo(map);
-                }
-                cont2++;
-            })
-
-            let vehicleRoute = await getDirections(locationsArray);
-
-            let path = L.geoJSON(vehicleRoute);
-
-            path.setStyle({
-                color: colors[cont]
-            });
-            map.addLayer(path);
-
-            cont++;
-        }
-    }
-
-    function deleteAllMarkers() {
-        map.eachLayer(function (layer) {
-            if (layer instanceof L.Marker) {
-                layer.remove();
-            }
-        });
-    }
-
-    async function showSolutionOnMap(optimizedSolution) {
-        let cont = 0;
-
-        for (const route of optimizedSolution.routes) {
-            let locationsArray = [];
-            let cont2 = 0;
-            route.locations.forEach(location => {
-                locationsArray.push(location.location)
-                if (cont2 === 0) {
-                    L.marker([
-                            location.location[1],
-                            location.location[0]
-                        ]
-                    ).addTo(map);
-                } else if (route.locations.length > cont2 + 1) {
-
-                    let coloredMarkerIcon = L.AwesomeMarkers.icon({
-                        icon: '',
-                        prefix: 'fa',
-                        markerColor: colors[cont],
-                        html: cont2
-                    });
-                    L.marker([
-                            location.location[1],
-                            location.location[0]
-                        ],
-                        {icon: coloredMarkerIcon}
-                    ).addTo(map);
-                }
-                cont2++;
-            })
-
-            let vehicleRoute = await getDirections(locationsArray);
-
-            let path = L.geoJSON(vehicleRoute);
-
-            path.setStyle({
-                color: colors[cont]
-            });
-            map.addLayer(path);
-
-            cont++;
-        }
-    }
-
-    async function getDirections(coordinates) {
-        let directionsApiUrl = "http://localhost:8080/ors/v2/directions/driving-car/geojson";
-
-        return await fetch(directionsApiUrl, {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({coordinates: coordinates})
-        }).then(response => response.json());
-    }
-
-    // Solving the problem
-    async function solveHardCodedProblem() {
-        // first address is the depot
-        let addresses = [
-            "Str. Sinaia 18, bucuresti",
-            "Aleea magura vulturului 7",
-            "Constantin Budisteanu 20",
-            "Aleea Ilioara 3"
-        ];
-        // the weight (demand) of the package for each address destination (todo: maybe include this in the addresses object)
-        // first is the depot so the value is 0
-        let demands = [0, 3, 5, 1];
-        // we have two cars each having a capacity of 5
-        let carsWithCapacity = [5, 5];
-
-        // get the polar coordinates (lat, lng) from the nominatim api
-        let nominatimResponses = addresses.map(address => getCoordinates(address));
-        const nominatimObjects = await Promise.all(nominatimResponses);
-
-        // extract the lat/lng from each nominatim query response and map them in an object required by the distance matrix
-        // e.g {"locations":[[26.1347683,44.4443487],[26.1604182,44.4125858],[26.0901043,44.4433876]]}
-        let locations = nominatimObjects
-            .flat(1)
-            .map(object => [object.lon, object.lat]);
-
-        // call the openrouteservice api to get the distance matrix
-        let distanceMatrix = await getDistanceMatrix(locations);
-
-        // add the demands and cars to the response from the distance matrix
-        addDemands(distanceMatrix, demands);
-        addCars(distanceMatrix, carsWithCapacity);
-
-        // send the distance matrix object to the Flask backend to calculate the routes
-        const optimizedSolution = await getSolution(distanceMatrix);
-
-        await showSolutionOnMap(optimizedSolution)
-        console.log(optimizedSolution);
-    }
-
-    async function getCoordinates(address) {
-        let nominatinApiUrl = "http://localhost:7070";
-
-        return await fetch(nominatinApiUrl + "/search?q=" + address + "&format=jsonv2", {
-            method: "POST"
-        }).then(response => response.json());
-    }
-
-    async function getDistanceMatrix(locations) {
-        let matrixApiUrl = "http://localhost:8080/ors/v2/matrix/driving-car";
-
-        return await fetch(matrixApiUrl, {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({locations: locations})
-        }).then(response => response.json());
-    }
-
-    function addDemands(distanceMatrix, demands) {
-        // add the demands of each location in the response received from the distance matrix api
-        // the demands are added in the metadata.query.locations object
-        for (let i = 0; i < demands.length; i++) {
-            distanceMatrix.metadata.query.locations[i] = {
-                location: distanceMatrix.metadata.query.locations[i],
-                demand: demands[i]
-            };
-        }
-
-    }
-
-    function addCars(distanceMatrix, carsWithCapacity) {
-        distanceMatrix.metadata.cars = carsWithCapacity;
-    }
-
-    async function getSolution(distanceMatrix) {
-        console.log(distanceMatrix);
-        return fetch("http://localhost:5001/api/cvrp", {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(distanceMatrix)
-        }).then(response => response.json());
-    }
-
-
-    // Alina
-    let i = 1;
-
-    function deleteTagAndMarker(el) {
-        let elementToBeRemoved = el.parentElement.parentElement.parentElement;
-        elementToBeRemoved.remove();
-        if (document.getElementsByClassName("tagClass").length === 1) {
-            i = 1;
-            document.getElementsByClassName("divWithSearchTags")[0].style.visibility = 'hidden';
-            document.getElementById("searchId").value = "";
-        }
-
-        // Delete marker by address
-        map.eachLayer(function (layer) {
-            if (layer instanceof L.Marker && elementToBeRemoved.textContent.includes(layer.address)) {
-                layer.remove();
-            }
-        });
-    }
-
-    async function addSearchTagToAddressList() {
-        let value = document.getElementById("searchId").value;
-        let divWithSearchTags = document.getElementsByClassName("divWithSearchTags")[0];
-        let interiorDiv = document.getElementsByClassName("interiorDivWithTags")[0];
-        if (divWithSearchTags.style.visibility === 'hidden') {
-            divWithSearchTags.style.visibility = 'visible';
-        }
-        let divWithSearchTag = document.getElementsByClassName("tagClass")[0];
-        let clone = divWithSearchTag.cloneNode(true);
-        interiorDiv.appendChild(clone);
-
-        const nominatimObject = await getCoordinates(value);
-        const fullAddress = nominatimObject[0].display_name;
-
-        document.getElementsByClassName("addressP")[i].innerHTML = fullAddress;
-        clone.style.display = 'block';
-        clone.id = 'clone-' + i;
-        i++;
-
-        // Add marker on map
-        let marker = L.marker([
-                nominatimObject[0].lat,
-                nominatimObject[0].lon
-            ]
-        ).addTo(map);
-        // Add the address to the marker so we can find it and delete the marker on address delete
-        marker.address = fullAddress;
-    }
-
-    let input = document.getElementById("searchId");
-
-    // Execute a function when the user releases a key on the keyboard
-    input.addEventListener("keyup", function (event) {
-        // Number 13 is the "Enter" key on the keyboard
-        if (event.key === 'Enter') {
-            // Cancel the default action, if needed
-            event.preventDefault();
-            // Trigger the adding of the tags
-            addSearchTagToAddressList();
-        }
-    });
-
-    async function generateRoutes() {
-        await solveProblemForSelectedMarkers();
-    }
-
-</script>
+<script src="app.js"></script>

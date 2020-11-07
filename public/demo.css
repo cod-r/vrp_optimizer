@@ -77,3 +77,43 @@
     margin-left: 10px;
     margin-right: 10px;
 }
+
+/* Madalina */
+#homeBtnId {
+    position: absolute;
+    z-index: 2;
+    margin-top: 100px;
+    margin-left: 20px;
+    width: 150px;
+}
+
+#carBtnId {
+    position: absolute;
+    z-index: 2;
+    margin-top: 140px;
+    margin-left: 20px;
+    width: 150px;
+}
+
+#backBtnId {
+    position: absolute;
+    z-index: 2;
+    margin-top: 30px;
+    margin-left: 20px;
+}
+
+#page1 {
+    position: absolute;
+    z-index: 2;
+    margin-top: 30px;
+    margin-left: 20px;
+    border-radius: 10px;
+    width: 300px;
+
+}
+
+.hide {
+    position: absolute !important;
+    top: -9999px !important;
+    left: -9999px !important;
+}
