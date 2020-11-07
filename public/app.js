@@ -1,3 +1,25 @@
+// Check for posted distance in express backend
+let backendResponse = false;
+
+setInterval(function () {
+    fetch("http://localhost:3000/distance_matrix", {
+        method: "GET",
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    }).then(response => response.json())
+        .then(async response => {
+            if (response.durations && backendResponse === false) {
+                backendResponse = true;
+                // // send the distance matrix object to the Flask backend to calculate the routes
+                const optimizedSolution = await getSolution(response);
+                await showSolutionOnMapForSelectedMarkers(optimizedSolution);
+                console.log("datao")
+            }
+        });
+}, 3000);
+
+
 const colors = ['blue', 'red', 'green', 'purple'];
 let depotLocation = 'Aleea Fizicienilor 2B';
 document.getElementById("depotLocationId").value = depotLocation;
