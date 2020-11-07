@@ -1,5 +1,6 @@
 // Check for posted distance in express backend
 let backendResponse = false;
+let ceva = 'abcs';
 
 setInterval(function () {
     fetch("http://localhost:3000/distance_matrix", {
@@ -28,7 +29,7 @@ document.getElementById("depotLocationId").value = depotLocation;
 let map = L.map('mapid', {
     zoomControl: false
 }).setView([44.432283, 26.104162], 13);
-L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+L.tileLayer('http://localhost:8090/tile/{z}/{x}/{y}.png', {
     maxZoom: 18
 }).addTo(map);
 L.control.zoom({
